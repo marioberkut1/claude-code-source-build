@@ -6,6 +6,7 @@
 На выходе — готовые .html в этой же папке, заливаются на любой хостинг.
 """
 from html import escape
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).parent
@@ -23,6 +24,61 @@ CONFIG = {
     "legal": "ИП [ФИО], ИНН [000000000000]",   # [заменить]
     "metrika_id": "",                          # номер счётчика Яндекс Метрики
     "year": "2026",
+    "slots": "Берём до 5 новых проектов в месяц — каждый веду лично",  # [проверить число]
+}
+
+# ───────────────────────── ЦЕНЫ ДЛЯ КАЛЬКУЛЯТОРА ─────────────────────────
+# Средние по рынку для малого бизнеса (частные специалисты и небольшие агентства, 2026).
+# Меняете цифры здесь → python3 build.py → калькулятор и цены «от» на страницах обновятся.
+PRICES = {
+    # Яндекс Директ: разовая настройка + ведение в месяц по порогам рекламного бюджета
+    "direct": {"setup": 15000, "shopExtra": 7000,
+               "fee": [[50000, 15000], [150000, 25000], [300000, 35000], [10**9, 45000]]},
+    # VK Ads: то же; cplRatio — во сколько раз заявка из VK дороже/дешевле, чем из Директа
+    "vk": {"setup": 12000, "cplRatio": 1.1,
+           "fee": [[50000, 15000], [150000, 22000], [10**9, 30000]]},
+    # SEO: абонемент по региону × множитель размера сайта
+    "seo": {"region": {"local": 25000, "msk": 40000, "rf": 55000},
+            "size": {"landing": 0.8, "site": 1, "shop": 1.4}},
+    # SMM: по количеству постов в неделю + опции; setup — оформление сообщества
+    "smm": {"posts": {"3": 20000, "5": 28000, "7": 36000}, "telegram": 8000, "video": 10000, "setup": 8000},
+    "site": {"none": 0, "express": 10000, "landing": 40000, "shop": 80000},
+    "analytics": 15000,
+    # скидка на ведение за пакет: количество каналов → доля
+    "bundle": {"0": 0, "1": 0, "2": 0.05, "3": 0.10, "4": 0.15},
+    # доля заявок, которые становятся продажами (для прогноза выручки)
+    "closeRate": 0.25,
+    # средняя цена заявки из Директа по нишам, ₽ (ориентир для прогноза)
+    "niches": {
+        "flowers": {"name": "Цветы и подарки", "cpl": 450},
+        "food": {"name": "Кафе, доставка еды", "cpl": 350},
+        "beauty": {"name": "Красота, медицина", "cpl": 700},
+        "repair": {"name": "Ремонт, стройка, услуги для дома", "cpl": 900},
+        "auto": {"name": "Авто: продажа и сервис", "cpl": 1200},
+        "edu": {"name": "Обучение, курсы", "cpl": 800},
+        "realty": {"name": "Недвижимость", "cpl": 2500},
+        "b2b": {"name": "B2B, производство, опт", "cpl": 2000},
+        "other": {"name": "Другое", "cpl": 1000},
+    },
+    "regions": {
+        "local": {"name": "Мой город / область", "cpl": 1},
+        "msk": {"name": "Москва и МО", "cpl": 1.35},
+        "rf": {"name": "Вся Россия", "cpl": 1.15},
+    },
+}
+
+
+def fmt(n):
+    return f"{n:,}".replace(",", " ") + " ₽"
+
+
+FROM = {  # цены «от» на карточках и страницах услуг — считаются из PRICES
+    "sites": fmt(PRICES["site"]["express"]),
+    "direct": fmt(PRICES["direct"]["fee"][0][1]) + "/мес",
+    "seo": fmt(int(PRICES["seo"]["region"]["local"] * PRICES["seo"]["size"]["landing"])) + "/мес",
+    "vk-ads": fmt(PRICES["vk"]["fee"][0][1]) + "/мес",
+    "analytics": fmt(PRICES["analytics"]) + " разово",
+    "smm": fmt(PRICES["smm"]["posts"]["3"]) + "/мес",
 }
 
 SERVICES = [
@@ -116,6 +172,7 @@ def header(active):
     <a class="header__logo" href="index.html" aria-label="Регион Маркетинг — на главную"><img src="assets/img/logo-light.svg" alt="Регион Маркетинг" width="150" height="48"></a>
     <nav class="nav" aria-label="Основное меню">
       <div class="nav__drop"><button type="button" aria-expanded="false" aria-haspopup="true">Услуги {icon("chev", "icon")}</button><div class="nav__menu">{svc_links}</div></div>
+      <a href="calculator.html"{cur("calculator")}>Цены</a>
       <a href="cases.html"{cur("cases")}>Кейсы</a>
       <a href="index.html#process">Как работаем</a>
       <a href="contacts.html"{cur("contacts")}>Контакты</a>
@@ -127,6 +184,7 @@ def header(active):
 </header>
 <nav class="mobile-nav" aria-label="Мобильное меню">
   {mob}
+  <a href="calculator.html">Калькулятор цены</a>
   <a href="cases.html">Кейсы</a>
   <a href="contacts.html">Контакты</a>
   <a href="tel:{CONFIG["phone_raw"]}">{CONFIG["phone"]}</a>
@@ -144,7 +202,7 @@ def footer():
         <p class="muted" style="color:var(--ink-inverse-muted);max-width:300px">Делаем продающие сайты и обеспечиваем поток клиентов. С 2009 года.</p>
       </div>
       <div><h4>Услуги</h4><ul>{svc}</ul></div>
-      <div><h4>Агентство</h4><ul><li><a href="cases.html">Кейсы</a></li><li><a href="index.html#process">Как работаем</a></li><li><a href="index.html#faq">Вопросы</a></li><li><a href="contacts.html">Контакты</a></li></ul></div>
+      <div><h4>Агентство</h4><ul><li><a href="calculator.html">Калькулятор цены</a></li><li><a href="cases.html">Кейсы</a></li><li><a href="index.html#process">Как работаем</a></li><li><a href="index.html#faq">Вопросы</a></li><li><a href="contacts.html">Контакты</a></li></ul></div>
       <div><h4>Связаться</h4><ul>
         <li><a href="tel:{CONFIG["phone_raw"]}">{CONFIG["phone"]}</a></li>
         <li><a href="mailto:{CONFIG["email"]}">{CONFIG["email"]}</a></li>
@@ -207,8 +265,8 @@ def modal():
     return f'''<dialog class="modal" id="lead-modal" aria-labelledby="modal-title">
   <div class="modal__in">
     <button class="modal__close" type="button" aria-label="Закрыть">{icon("close")}</button>
-    <h2 class="h3" id="modal-title">Получить расчёт</h2>
-    <p class="muted">Перезвоним в течение рабочего часа и за 1 день пришлём прогноз заявок.</p>
+    <h2 class="h3" id="modal-title">Бесплатный разбор вашего маркетинга</h2>
+    <p class="muted">Перезвоним в течение рабочего часа. За 1 день пришлём прогноз заявок, цену лида и план запуска — даже если не будем работать вместе.</p>
     <form class="lead-form" novalidate>
     {form_fields("m")}
     </form>
@@ -216,7 +274,7 @@ def modal():
 </dialog>'''
 
 
-def page(slug, title, description, body, active=None, noindex=False, with_cta=True, preselect=None, cta_kwargs=None):
+def page(slug, title, description, body, active=None, noindex=False, with_cta=True, preselect=None, cta_kwargs=None, with_calc=False):
     metrika = ""
     if CONFIG["metrika_id"]:
         mid = CONFIG["metrika_id"]
@@ -225,6 +283,8 @@ def page(slug, title, description, body, active=None, noindex=False, with_cta=Tr
     url = CONFIG["domain"] + ("/" if slug == "index" else f"/{slug}.html")
     cfg_js = (f'window.RG_CONFIG={{metrikaId:{CONFIG["metrika_id"] or "null"},formEndpoint:"send.php",thanksPage:"thanks.html",'
               f'phone:"{CONFIG["phone"]}",phoneRaw:"{CONFIG["phone_raw"]}",telegram:"{CONFIG["telegram"]}"}};')
+    calc_js = (f'<script>window.RG_PRICES={json.dumps(PRICES, ensure_ascii=False)};</script>'
+               '<script src="assets/js/calc.js" defer></script>') if with_calc else ""
     cta = cta_section(preselect, **(cta_kwargs or {})) if with_cta else ""
     html = f'''<!doctype html>
 <html lang="ru">
@@ -257,10 +317,121 @@ def page(slug, title, description, body, active=None, noindex=False, with_cta=Tr
 {modal()}
 <script>{cfg_js}</script>
 <script src="assets/js/main.js" defer></script>
+{calc_js}
 </body>
 </html>
 '''
     (ROOT / f"{slug}.html").write_text(html, encoding="utf-8")
+
+
+# ───────────────────────── КАЛЬКУЛЯТОР ─────────────────────────
+
+def _radios(name, options, checked):
+    return "".join(
+        f'<label><input type="radio" name="{name}" value="{v}"{" checked" if v == checked else ""}><span>{t}</span></label>'
+        for v, t in options)
+
+
+def _range(name, lo, hi, step, value, label):
+    return f'''<div class="calc-range">
+        <div class="calc-range__top"><label for="c-{name}">{label}</label><output data-out="{name}">{fmt(value)}</output></div>
+        <input id="c-{name}" type="range" name="{name}" min="{lo}" max="{hi}" step="{step}" value="{value}">
+        <div class="calc-range__scale"><span>{fmt(lo)}</span><span>{fmt(hi)}</span></div>
+      </div>'''
+
+
+def _svc(key, title, sub, opts, checked=True):
+    return f'''<div class="calc-svc" data-svc="{key}">
+      <label class="calc-svc__head">
+        <input type="checkbox" name="svc_{key.split("-")[0]}"{" checked" if checked else ""}>
+        <span class="calc-svc__check" aria-hidden="true"></span>
+        <span><b>{title}</b><small>{sub}</small></span>
+      </label>
+      <div class="calc-svc__opts">{opts}</div>
+    </div>'''
+
+
+def calculator(heading=True):
+    niches = "".join(f'<option value="{k}"{" selected" if k == "flowers" else ""}>{v["name"]}</option>' for k, v in PRICES["niches"].items())
+    regions = _radios("region", [(k, v["name"]) for k, v in PRICES["regions"].items()], "local")
+    head = '''<div class="section__head">
+      <div><p class="label">Калькулятор</p><h2 class="rg-headline h2" style="margin-top:12px">Сколько стоит маркетинг и сколько <em>заявок</em> он принесёт</h2></div>
+      <p class="muted">Выберите каналы — калькулятор посчитает цену и прогноз заявок по средним данным вашей ниши. Цена из калькулятора фиксируется в договоре.</p>
+    </div>''' if heading else ""
+    return f'''<section class="section section--raised" id="calculator">
+  <div class="container">
+    {head}
+    <div class="calc" id="calc">
+      <div class="calc__form">
+        <fieldset class="calc-step">
+          <legend><span>1</span> Ваш бизнес</legend>
+          <div class="row2">
+            <div class="field"><label for="c-niche">Ниша</label><select id="c-niche" name="niche">{niches}</select></div>
+            <div class="field"><label for="c-check">Средний чек, ₽</label><input id="c-check" name="check" type="number" min="0" step="500" value="5000" inputmode="numeric"></div>
+          </div>
+          <div class="field"><span class="field__label">Где ваши клиенты</span><div class="opts">{regions}</div></div>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend><span>2</span> Каналы привлечения</legend>
+          {_svc("direct", "Яндекс Директ", "Поиск, РСЯ — заявки с первой недели",
+                _range("direct_budget", 20000, 500000, 5000, 60000, "Рекламный бюджет в месяц") +
+                '<label class="tick"><input type="checkbox" name="direct_shop"><span>Товарные кампании / Мастер кампаний (для магазинов)</span></label>')}
+          {_svc("vk-ads", "Таргет VK Ads", "ВКонтакте, Одноклассники, лид-формы",
+                _range("vk_budget", 15000, 300000, 5000, 30000, "Рекламный бюджет в месяц"), checked=False)}
+          {_svc("seo", "SEO-продвижение", "Топ Яндекса и Google — заявки без оплаты за клик",
+                '<div class="field"><span class="field__label">Сайт</span><div class="opts">' + _radios("seo_size", [("landing", "Лендинг"), ("site", "Сайт до 50 стр."), ("shop", "Интернет-магазин")], "site") + '</div></div>', checked=False)}
+          {_svc("smm", "SMM", "Ведение сообществ ВК и Telegram",
+                '<div class="field"><span class="field__label">Постов в неделю</span><div class="opts">' + _radios("smm_posts", [("3", "3"), ("5", "5"), ("7", "7")], "3") + '</div></div>'
+                '<label class="tick"><input type="checkbox" name="smm_tg"><span>+ Telegram-канал</span></label>'
+                '<label class="tick"><input type="checkbox" name="smm_video"><span>+ Клипы и истории</span></label>', checked=False)}
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend><span>3</span> Дополнительно</legend>
+          <div class="field"><span class="field__label">Сайт</span><div class="opts">{_radios("site", [("none", "Уже есть"), ("express", "Экспресс-сайт · " + fmt(PRICES["site"]["express"])), ("landing", "Продающий лендинг · " + fmt(PRICES["site"]["landing"])), ("shop", "Магазин / многостраничник · " + fmt(PRICES["site"]["shop"]))], "none")}</div></div>
+          <label class="tick"><input type="checkbox" name="analytics"><span>Сквозная аналитика: коллтрекинг + CRM · {fmt(PRICES["analytics"])} разово</span></label>
+        </fieldset>
+      </div>
+
+      <aside class="calc__sum" aria-live="polite">
+        <p class="calc__sum-label">Ведение в месяц</p>
+        <p class="calc__big" data-r="monthly">0 ₽</p>
+        <dl class="calc__rows">
+          <div data-r="disc-row" hidden><dt>Скидка за пакет</dt><dd data-r="disc"></dd></div>
+          <div><dt>Разово: настройка, сайт</dt><dd data-r="once">0 ₽</dd></div>
+          <div><dt>Рекламный бюджет<br><small>платите напрямую в Яндекс / VK</small></dt><dd data-r="ads">—</dd></div>
+        </dl>
+        <p class="calc__upsell" data-r="upsell"></p>
+        <p class="calc__empty" data-r="empty" hidden>Выберите хотя бы один канал.</p>
+
+        <div class="calc__fc" data-r="forecast">
+          <p class="calc__sum-label">Прогноз на месяц</p>
+          <div class="calc__fc-grid">
+            <div><b data-r="leads">—</b><span>заявок</span></div>
+            <div><b data-r="cpl">—</b><span>цена заявки</span></div>
+            <div><b data-r="sales">—</b><span>продаж</span></div>
+            <div><b data-r="romi">—</b><span>окупаемость</span></div>
+          </div>
+          <p class="calc__rev">Выручка: <b data-r="revenue">—</b></p>
+          <p class="calc__note" data-r="romi-note"></p>
+        </div>
+        <p class="calc__note" data-r="seo-note" hidden>SEO и SMM работают накопительно: первые заявки из поиска — через 2–4 месяца, дальше поток растёт без оплаты за клик.</p>
+
+        <form class="lead-form calc__form-lead" novalidate>
+          <input type="hidden" name="calc" value="">
+          <input type="hidden" name="service[]" value="Калькулятор">
+          <div class="field"><label for="calc-phone">Телефон — пришлём точный расчёт</label><input id="calc-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" required></div>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="consent"><input type="checkbox" name="consent" required><span>Согласен с <a href="privacy.html" target="_blank">политикой обработки данных</a></span></label>
+          <button class="rg-btn rg-btn--primary" type="submit">Зафиксировать цену</button>
+          <p class="form-note" role="status" aria-live="polite"></p>
+        </form>
+        <p class="calc__fine">Прогноз — по средней цене заявки в нише за 2025–2026 гг. Точные цифры по вашему региону и конкурентам — после бесплатного разбора.</p>
+      </aside>
+    </div>
+  </div>
+</section>'''
 
 
 # ───────────────────────── ГЛАВНАЯ ─────────────────────────
@@ -272,66 +443,104 @@ HERO_ART = '''<div class="hero__art" aria-hidden="true">
     <rect x="160" y="0" width="320" height="480" fill="#6147ff"/>
     <polyline class="growth" stroke="#f3f3f3" points="0,400 72,340 112,412 160,372 208,428 312,168 360,252 400,140 492,40"/>
   </svg>
+  <div class="hero__badge"><b>+26 продаж</b><span>автосалону за первый месяц</span></div>
 </div>'''
+
+PAINS = [
+    ("Отдали 50 000 ₽ на рекламу — пришли три заявки, и те нецелевые", "Кампании собраны «на всё подряд», минус-слов нет, РСЯ крутится на мобильных играх."),
+    ("Подрядчик присылает отчёт с кликами и показами", "Сколько заявок и продаж — не знает никто. Непонятно, за что вы платите каждый месяц."),
+    ("Сайт есть, но клиенты — только по сарафану", "Сайт красивый, но не отвечает на вопросы клиента и не ведёт к звонку."),
+    ("Конкурент в топе Яндекса, а вас там нет", "Клиенты ищут «доставка цветов рядом» и находят не вас. Каждый день."),
+]
+
+GUARANTEES = [
+    ("Цена — в договоре", "Стоимость из расчёта фиксируем до старта. Не растёт в процессе."),
+    ("Всё — ваше", "Сайт, домен, рекламные кабинеты и Метрика оформлены на вас с первого дня."),
+    ("Без договора на год", "Помесячная оплата. Остаёмся, потому что приносим заявки, а не из-за штрафов."),
+    ("Отчёт в рублях", "Каждую неделю: сколько заявок, по какой цене, из какого канала."),
+]
 
 
 def build_index():
     services = ""
-    for i, (slug, short, menu, desc, ic) in enumerate(SERVICES):
-        feat = " service--featured" if slug == "sites" else ""
+    for slug, short, menu, desc, ic in SERVICES:
+        feat = " service--featured" if slug == "direct" else ""
         services += f'''<a class="card service{feat}" href="{slug}.html">
       <span class="service__icon">{icon(ic)}</span>
       <h3 class="h3">{menu}</h3>
       <p>{desc}</p>
+      <p class="service__price">от {FROM[slug]}</p>
       <span class="service__more">Подробнее {icon("arrow")}</span>
     </a>'''
     stats = "".join(f"<div><b>{v}</b><span>{l}</span></div>" for v, l in STATS)
     cases = "".join(case_card(k) for k in ["botanika", "allo-avto", "pyl-da-zhar", "malina"])
+    pains = "".join(f'<div class="card pain"><h3 class="h3">«{t}»</h3><p class="muted">{x}</p></div>' for t, x in PAINS)
+    guar = "".join(f'<div class="guar"><h3 class="h3">{t}</h3><p class="muted">{x}</p></div>' for t, x in GUARANTEES)
     body = f'''<section class="hero">
   <div class="container hero__grid">
     <div>
-      <p class="label">Агентство интернет-маркетинга</p>
-      <h1 class="rg-headline display">Делаем <em>продающие сайты</em> и обеспечиваем поток клиентов</h1>
-      <p class="lead">Сайт, реклама в Яндексе и VK, SEO и аналитика — одной командой и под одну цель: заявки по понятной цене. Отчитываемся в рублях, а не в кликах.</p>
+      <p class="label">Маркетинг для малого бизнеса под ключ</p>
+      <h1 class="rg-headline display">Заявки для вашего бизнеса — <em>уже через неделю</em></h1>
+      <p class="lead">Сайт, Яндекс Директ, VK Ads, SEO и SMM одной командой. Строим маркетинг так, чтобы он стоил не больше 10% от выручки, — и показываем расчёт до старта.</p>
+      <ul class="checks hero__checks">
+        <li>Первые заявки из Директа — в первую неделю</li>
+        <li>Отчёт в заявках и рублях, а не в кликах</li>
+        <li>Цена фиксируется в договоре</li>
+      </ul>
       <div class="btn-row">
-        <a class="rg-btn rg-btn--primary" href="#lead" data-open-lead>Получить расчёт</a>
-        <a class="rg-btn rg-btn--secondary" href="#cases">Смотреть кейсы</a>
+        <a class="rg-btn rg-btn--primary rg-btn--lg" href="#calculator">Рассчитать стоимость</a>
+        <a class="rg-btn rg-btn--secondary rg-btn--lg" href="#lead" data-open-lead>Бесплатный разбор</a>
       </div>
-      <div class="hero__facts">
-        <div><b>97 млн ₽</b><span>дохода клиентов через наши сайты</span></div>
-        <div><b>100+</b><span>проектов</span></div>
-        <div><b>с 2009</b><span>года на рынке</span></div>
-      </div>
+      <p class="hero__slots">{CONFIG["slots"]}</p>
     </div>
     {HERO_ART}
   </div>
-</section>
-
-<section class="section section--raised" id="services">
   <div class="container">
-    <div class="section__head">
-      <h2 class="rg-headline h2">Шесть инструментов, <em>одна цель</em> — заявки</h2>
-      <p class="muted">Берём проект целиком или отдельный канал. Каждый инструмент настраиваем на цифру: стоимость заявки и продажи.</p>
+    <div class="proof">
+      <div><b>97 млн ₽</b><span>заработали клиенты через наши сайты</span></div>
+      <div><b>100+</b><span>проектов с 2009 года</span></div>
+      <div><b>10–20%</b><span>средняя конверсия сайтов</span></div>
+      <div><b>0%</b><span>рассрочка на услуги через Т-Банк</span></div>
     </div>
-    <div class="grid grid--3">{services}</div>
-  </div>
-</section>
-
-<section class="section" id="cases">
-  <div class="container">
-    <div class="section__head">
-      <h2 class="rg-headline h2">Кейсы: <em>деньги</em>, которые сайты заработали клиентам</h2>
-      <a class="rg-btn rg-btn--secondary" href="cases.html">Все кейсы</a>
-    </div>
-    <div class="cases">{cases}</div>
   </div>
 </section>
 
 <section class="section section--ink">
   <div class="container">
     <div class="section__head">
-      <h2 class="rg-headline h2">Работаем на результат <em>с 2009 года</em></h2>
+      <h2 class="rg-headline h2">Узнаёте <em>свой бизнес</em>?</h2>
+      <p class="muted">С этим к нам приходит большинство владельцев бизнеса. Каждый месяц в такой ситуации — это деньги, которые уходят конкурентам.</p>
     </div>
+    <div class="grid grid--4 pains">{pains}</div>
+    <p class="pains__answer">Мы собираем <b>сайт, рекламу и аналитику в одну связку</b> и отвечаем за результат целиком: сколько заявок, по какой цене, сколько продаж.</p>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="rg-headline h2">Шесть инструментов, <em>одна цель</em> — заявки</h2>
+      <p class="muted">Берём проект целиком или отдельный канал. Цены — средние по рынку, без «от 5 000 ₽, а потом допродажи».</p>
+    </div>
+    <div class="grid grid--3">{services}</div>
+  </div>
+</section>
+
+<section class="section section--raised" id="cases">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="rg-headline h2">Не обещаем — <em>показываем</em> деньги клиентов</h2>
+      <a class="rg-btn rg-btn--secondary" href="cases.html">Все кейсы</a>
+    </div>
+    <div class="cases">{cases}</div>
+  </div>
+</section>
+
+{calculator().replace("section section--raised", "section")}
+
+<section class="section section--ink">
+  <div class="container">
+    <div class="section__head"><h2 class="rg-headline h2">Работаем на результат <em>с 2009 года</em></h2></div>
     <div class="stats">{stats}</div>
   </div>
 </section>
@@ -339,30 +548,52 @@ def build_index():
 <section class="section" id="process">
   <div class="container">
     <div class="section__head">
-      <h2 class="rg-headline h2">Как работаем: <em>от заявки до продаж</em></h2>
-      <p class="muted">Прозрачно на каждом шаге: вы видите план, сроки и цифры до старта.</p>
+      <h2 class="rg-headline h2">От звонка до первых заявок — <em>7 дней</em></h2>
+      <p class="muted">Вы видите план, сроки и цифры до того, как заплатите.</p>
     </div>
     <ol class="steps">
-      <li><h3 class="h3">Разбор</h3><p>Созвон 30 минут: ниша, средний чек, маржа, текущие каналы. Считаем, какая цена заявки окупается.</p></li>
-      <li><h3 class="h3">Расчёт и план</h3><p>За 1 день — прогноз заявок, бюджет и план запуска. Фиксируем сроки и стоимость в договоре.</p></li>
-      <li><h3 class="h3">Запуск</h3><p>Сайт — от 3 дней, реклама — от 2 дней после согласования. Сразу ставим Метрику и цели.</p></li>
-      <li><h3 class="h3">Рост</h3><p>Еженедельно чистим трафик и тестируем гипотезы. Раз в месяц — отчёт: заявки, цена лида, продажи.</p></li>
+      <li><h3 class="h3">Разбор · день 1</h3><p>Созвон 30 минут: ниша, средний чек, маржа, текущие каналы. Считаем, какая цена заявки окупается.</p></li>
+      <li><h3 class="h3">Расчёт · день 2</h3><p>Прогноз заявок, бюджет и план запуска. Фиксируем цену и сроки в договоре.</p></li>
+      <li><h3 class="h3">Запуск · дни 3–7</h3><p>Сайт, кампании, Метрика и цели. Первые заявки — уже в первую неделю.</p></li>
+      <li><h3 class="h3">Рост · каждый месяц</h3><p>Чистим трафик, тестируем гипотезы, снижаем цену заявки. Отчёт — в рублях.</p></li>
     </ol>
   </div>
 </section>
 
 <section class="section section--raised">
-  <div class="container split">
-    <div>
-      <h2 class="rg-headline h2">Почему с нами <em>выгоднее</em>, чем со штатным маркетологом</h2>
+  <div class="container">
+    <div class="section__head"><h2 class="rg-headline h2">Рискуете <em>только временем</em> на созвон</h2></div>
+    <div class="grid grid--4">{guar}</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container founder">
+    <div class="founder__img" aria-hidden="true">
+      <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid slice"><rect width="400" height="480" fill="#6147ff"/><rect x="0" y="300" width="160" height="180" fill="#1d1d1e"/><polyline class="growth" stroke="#f3f3f3" points="-10,420 70,360 110,420 170,380 220,430 300,200 340,270 380,150 420,90"/></svg>
+      <!-- [заменить на фото: <img src="assets/img/founder.jpg" alt="Александр Нестеров"> ] -->
     </div>
-    <ul class="checks">
-      <li><b>Один ответственный за весь путь клиента.</b> Сайт, реклама и аналитика не спорят между собой, кто виноват в падении заявок.</li>
-      <li><b>Считаем в деньгах.</b> Метрика, цели и коллтрекинг с первого дня — видно, какой канал окупается.</li>
-      <li><b>Быстрый запуск.</b> Сайт от 3 дней, первые заявки из Директа — в первую неделю.</li>
-      <li><b>Сайт — ваш актив.</b> Домен, аккаунты и доступы оформлены на вас.</li>
-      <li><b>Опыт в локальном бизнесе.</b> Цветы, доставка еды, автосалоны, услуги — знаем, как продавать в регионах.</li>
-    </ul>
+    <div>
+      <p class="label">Кто отвечает за результат</p>
+      <h2 class="rg-headline h2" style="margin:12px 0 24px">Александр Нестеров, <em>основатель</em></h2>
+      <p class="lead">25 лет в маркетинге. Руководил маркетинговыми направлениями в LG Electronics, Sony и Indesit, с 2009 года — в интернет-маркетинге для малого и среднего бизнеса.</p>
+      <blockquote class="founder__quote">«Я лично веду каждый проект. Вы общаетесь не с менеджером, который пересказывает задачу, а с тем, кто настраивает рекламу и отвечает за цифры».</blockquote>
+      <div class="btn-row"><a class="rg-btn rg-btn--primary" href="#lead" data-open-lead>Обсудить проект</a><a class="rg-btn rg-btn--secondary" href="{CONFIG["telegram"]}" target="_blank" rel="noopener">Написать в Telegram</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--ink">
+  <div class="container express">
+    <div>
+      <p class="label">Нет сайта? Начните с малого</p>
+      <h2 class="rg-headline h1" style="margin:12px 0 16px">Экспресс-сайт за <em>{fmt(PRICES["site"]["express"])}</em> и 3 дня</h2>
+      <p class="lead muted">Готовый продающий шаблон под вашу нишу: оффер, каталог, форма заявки, Метрика. Без правок — поэтому быстро и недорого. Можно в рассрочку: от 460 ₽ в месяц.</p>
+    </div>
+    <div class="express__cta">
+      <ul class="checks"><li>Запуск за 3 дня</li><li>Готов к рекламе в Директе и VK</li><li>Сайт и домен — ваши</li></ul>
+      <a class="rg-btn rg-btn--on-accent rg-btn--lg" href="#lead" data-open-lead data-service="Сайт">Хочу экспресс-сайт</a>
+    </div>
   </div>
 </section>
 
@@ -370,17 +601,34 @@ def build_index():
   <div class="container split">
     <h2 class="rg-headline h2">Частые <em>вопросы</em></h2>
     <div class="faq">
-      <details><summary>Сколько стоит и от чего зависит цена?</summary><p>Стоимость зависит от ниши, региона и объёма работ. Точную сумму и прогноз заявок присылаем после короткого разбора — за 1 рабочий день, бесплатно.</p></details>
+      <details><summary>Сколько стоит?</summary><p>Ведение Директа — от {FROM["direct"]}, VK Ads — от {FROM["vk-ads"]}, SEO — от {FROM["seo"]}, SMM — от {FROM["smm"]}, сайт — от {FROM["sites"]}. Точную сумму для вашей ниши покажет <a href="#calculator">калькулятор</a>, а на разборе зафиксируем её в договоре.</p></details>
       <details><summary>Когда будут первые заявки?</summary><p>Из Яндекс Директа и VK Ads — обычно в первую неделю после запуска. SEO — накопительный канал: первые позиции через 2–4 месяца, дальше поток растёт без оплаты за клик.</p></details>
+      <details><summary>А если заявок не будет?</summary><p>До старта считаем прогноз и показываем, на какую цену заявки ориентируемся. Если через месяц цифры хуже прогноза — разбираем причины и перестраиваем кампании без доплат. Договор помесячный: держать вас нечем, кроме результата.</p></details>
+      <details><summary>Рекламный бюджет платится вам?</summary><p>Нет. Бюджет вы пополняете сами в своём кабинете Яндекса или VK — деньги под вашим контролем. Нам платите только за работу.</p></details>
+      <details><summary>Можно в рассрочку?</summary><p>Да, через Т-Банк — без переплаты.</p></details>
       <details><summary>Вы работаете с регионами?</summary><p>Да. Большая часть клиентов — локальный бизнес Подмосковья и регионов: Щёлково, Пушкино, Краснодар. Работаем удалённо по всей России.</p></details>
-      <details><summary>Кому принадлежит сайт и рекламные кабинеты?</summary><p>Вам. Домен, Tilda, кабинеты Директа и VK, Метрика — на вашем аккаунте или с передачей доступов.</p></details>
-      <details><summary>Можно заказать только одну услугу?</summary><p>Да. Но лучший результат даёт связка: сайт + реклама + аналитика — тогда видно, сколько стоит каждая продажа.</p></details>
     </div>
   </div>
 </section>'''
-    page("index", "Регион Маркетинг — продающие сайты, Яндекс Директ, SEO и VK Ads",
-         "Агентство интернет-маркетинга «Регион Маркетинг»: продающие сайты на Tilda, Яндекс Директ, SEO, VK Ads, SMM и сквозная аналитика. 100+ проектов с 2009 года. Бесплатный расчёт заявок.",
-         body)
+    page("index", "Регион Маркетинг — заявки для малого бизнеса: сайты, Яндекс Директ, SEO, VK Ads, SMM",
+         "Маркетинг для малого бизнеса под ключ: сайт, Яндекс Директ, VK Ads, SEO и SMM. Калькулятор стоимости и прогноз заявок. 97 млн ₽ дохода клиентов, 100+ проектов с 2009 года.",
+         body, with_calc=True,
+         cta_kwargs=dict(title="Узнайте, сколько <em>заявок</em> недополучаете",
+                         text="Бесплатный разбор за 1 день: прогноз заявок и цены лида для вашей ниши, 3 конкурента и где они берут клиентов, план запуска с цифрами. Останется у вас, даже если не будем работать вместе."))
+
+
+def build_calculator():
+    body = f'''<section class="page-hero" style="padding-bottom:32px">
+  <div class="container">
+    <p class="crumbs"><a href="index.html">Главная</a> / Калькулятор</p>
+    <h1 class="rg-headline h1">Калькулятор <em>стоимости</em> маркетинга</h1>
+    <p class="lead">Яндекс Директ, VK Ads, SEO и SMM — цена ведения, разовые работы и прогноз заявок для вашей ниши за минуту. Цена из калькулятора фиксируется в договоре.</p>
+  </div>
+</section>
+{calculator(heading=False)}'''
+    page("calculator", "Калькулятор стоимости: Яндекс Директ, VK Ads, SEO, SMM — Регион Маркетинг",
+         "Посчитайте стоимость Яндекс Директа, VK Ads, SEO и SMM для своего бизнеса и прогноз заявок по нише. Скидка до 15% на пакет услуг.",
+         body, with_calc=True)
 
 
 # ───────────────────────── СТРАНИЦЫ УСЛУГ ─────────────────────────
@@ -488,6 +736,50 @@ SERVICE_PAGES = {
 }
 
 
+def price_block(slug, short):
+    d, v, sm, st = PRICES["direct"], PRICES["vk"], PRICES["smm"], PRICES["site"]
+    def tiers(fee):
+        out, lo = [], 0
+        for cap, f in fee:
+            out.append(f"<li>Бюджет {'до ' + fmt(cap) if cap < 10**8 else 'от ' + fmt(lo)} — <b>{fmt(f)}/мес</b></li>")
+            lo = cap
+        return "".join(out)
+    cards = {
+        "sites": [("Экспресс-сайт", fmt(st["express"]), "Готовый продающий шаблон под нишу, запуск за 3 дня, без правок. Рассрочка от 460 ₽/мес."),
+                  ("Продающий лендинг", fmt(st["landing"]), "Прототип под заявки, тексты, дизайн, Метрика и цели. Лучший вариант под рекламу."),
+                  ("Магазин / многостраничник", fmt(st["shop"]), "Каталог, корзина, онлайн-оплата, SEO-структура под продвижение.")],
+        "direct": [("Настройка", fmt(d["setup"]), f"Семантика, поиск + РСЯ, ретаргетинг, цели. Товарные кампании — +{fmt(d['shopExtra'])}."),
+                   ("Ведение", "от " + fmt(d["fee"][0][1]) + "/мес", "<ul class='tiers'>" + tiers(d["fee"]) + "</ul>"),
+                   ("Рекламный бюджет", "от 20 000 ₽", "Платите напрямую в Яндекс, в своём кабинете. Нам — только за работу.")],
+        "vk-ads": [("Настройка", fmt(v["setup"]), "Аудитории, креативы, лид-формы, пиксель VK и цели."),
+                   ("Ведение", "от " + fmt(v["fee"][0][1]) + "/мес", "<ul class='tiers'>" + tiers(v["fee"]) + "</ul>"),
+                   ("Рекламный бюджет", "от 15 000 ₽", "Платите напрямую в VK Реклама, в своём кабинете.")],
+        "seo": [("Лендинг", "от " + fmt(int(PRICES["seo"]["region"]["local"] * 0.8)) + "/мес", "Локальный бизнес, один город, до 10 страниц."),
+                ("Сайт до 50 страниц", "от " + fmt(PRICES["seo"]["region"]["local"]) + "/мес", "Москва и МО — от " + fmt(PRICES["seo"]["region"]["msk"]) + "/мес, вся Россия — от " + fmt(PRICES["seo"]["region"]["rf"]) + "/мес."),
+                ("Интернет-магазин", "от " + fmt(int(PRICES["seo"]["region"]["local"] * 1.4)) + "/мес", "Категории, фильтры, карточки товаров, фиды в Яндекс.")],
+        "smm": [("3 поста в неделю", fmt(sm["posts"]["3"]) + "/мес", "Контент-план, тексты, визуал, модерация. Оформление сообщества — " + fmt(sm["setup"]) + " разово."),
+                ("5 постов в неделю", fmt(sm["posts"]["5"]) + "/мес", "Для ниш с частыми новинками и акциями: цветы, еда, красота."),
+                ("Опции", "+" + fmt(sm["telegram"]), "Telegram-канал; клипы и истории — +" + fmt(sm["video"]) + "/мес.")],
+        "analytics": [("Базовая", "Бесплатно", "Метрика, цели и UTM — входят в любую услугу."),
+                      ("Сквозная", fmt(PRICES["analytics"]) + " разово", "Коллтрекинг, передача заявок в CRM, офлайн-конверсии, дашборд."),
+                      ("Сопровождение", "в ведении", "При ведении рекламы отчёт по каналам — каждую неделю.")],
+    }[slug]
+    html = "".join(f'<div class="card price"><p class="label">{t}</p><p class="price__val">{pr}</p><div class="muted">{x}</div></div>' for t, pr, x in cards)
+    calc_btn = (f'<a class="rg-btn rg-btn--primary" href="calculator.html?s={slug}">Рассчитать точно</a>'
+                if slug in ("direct", "vk-ads", "seo", "smm") else
+                f'<a class="rg-btn rg-btn--primary" href="#lead" data-open-lead data-service="{short}">Получить расчёт</a>')
+    return f'''<section class="section" id="price">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="rg-headline h2">Сколько <em>стоит</em></h2>
+      {calc_btn}
+    </div>
+    <div class="grid grid--3">{html}</div>
+    <p class="caption" style="margin-top:24px">Скидка на ведение при заказе нескольких каналов: 2 — 5%, 3 — 10%, 4 — 15%. Рассрочка 0% через Т-Банк.</p>
+  </div>
+</section>'''
+
+
 def build_service(slug):
     d = SERVICE_PAGES[slug]
     short = next(s[1] for s in SERVICES if s[0] == slug)
@@ -504,7 +796,7 @@ def build_service(slug):
     <p class="lead">{d["lead"]}</p>
     <div class="btn-row">
       <a class="rg-btn rg-btn--primary" href="#lead" data-open-lead data-service="{short}">Получить расчёт</a>
-      <a class="rg-btn rg-btn--secondary" href="#service-cases">Смотреть кейсы</a>
+      <a class="rg-btn rg-btn--secondary" href="#price">Цены</a>
     </div>
   </div>
 </section>
@@ -527,7 +819,9 @@ def build_service(slug):
   </div>
 </section>
 
-<section class="section" id="service-cases">
+{price_block(slug, short)}
+
+<section class="section section--raised" id="service-cases">
   <div class="container">
     <div class="section__head">
       <h2 class="rg-headline h2">Результаты <em>клиентов</em></h2>
@@ -537,7 +831,7 @@ def build_service(slug):
   </div>
 </section>
 
-<section class="section section--raised">
+<section class="section">
   <div class="container split">
     <h2 class="rg-headline h2">Вопросы <em>по услуге</em></h2>
     <div class="faq">{faq}</div>
@@ -627,7 +921,7 @@ def build_simple():
 
 
 def build_meta():
-    pages = ["", "sites.html", "direct.html", "seo.html", "vk-ads.html", "analytics.html", "smm.html", "cases.html", "contacts.html"]
+    pages = ["", "sites.html", "direct.html", "seo.html", "vk-ads.html", "analytics.html", "smm.html", "calculator.html", "cases.html", "contacts.html"]
     urls = "".join(f"<url><loc>{CONFIG['domain']}/{p}</loc></url>" for p in pages)
     (ROOT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n', encoding="utf-8")
@@ -639,6 +933,7 @@ if __name__ == "__main__":
     build_index()
     for s in SERVICE_PAGES:
         build_service(s)
+    build_calculator()
     build_cases()
     build_contacts()
     build_simple()

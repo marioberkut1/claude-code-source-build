@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор стоимости: Яндекс Директ, VK Ads, SEO, SMM — Регион Маркетинг</title>
+<meta name="description" content="Посчитайте стоимость Яндекс Директа, VK Ads, SEO и SMM для своего бизнеса и прогноз заявок по нише. Скидка до 15% на пакет услуг.">
+
+<link rel="canonical" href="https://region-studio.ru/calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Калькулятор стоимости: Яндекс Директ, VK Ads, SEO, SMM — Регион Маркетинг">
+<meta property="og:description" content="Посчитайте стоимость Яндекс Директа, VK Ads, SEO и SMM для своего бизнеса и прогноз заявок по нише. Скидка до 15% на пакет услуг.">
+<meta property="og:url" content="https://region-studio.ru/calculator.html">
+<meta property="og:locale" content="ru_RU">
+<meta name="theme-color" content="#6147ff">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/Gilroy-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Gilroy-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<header class="header">
+  <div class="container header__in">
+    <a class="header__logo" href="index.html" aria-label="Регион Маркетинг — на главную"><img src="assets/img/logo-light.svg" alt="Регион Маркетинг" width="150" height="48"></a>
+    <nav class="nav" aria-label="Основное меню">
+      <div class="nav__drop"><button type="button" aria-expanded="false" aria-haspopup="true">Услуги <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="nav__menu"><a href="sites.html">Продающие сайты</a><a href="direct.html">Яндекс Директ</a><a href="seo.html">SEO-продвижение</a><a href="vk-ads.html">Таргет VK Ads</a><a href="analytics.html">Сквозная аналитика</a><a href="smm.html">SMM</a></div></div>
+      <a href="calculator.html" aria-current="page">Цены</a>
+      <a href="cases.html">Кейсы</a>
+      <a href="index.html#process">Как работаем</a>
+      <a href="contacts.html">Контакты</a>
+    </nav>
+    <a class="header__phone" href="tel:+70000000000">+7 (000) 000-00-00</a>
+    <a class="rg-btn rg-btn--primary header__cta" href="#lead" data-open-lead>Получить расчёт</a>
+    <button class="burger" type="button" aria-label="Меню" aria-expanded="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+</header>
+<nav class="mobile-nav" aria-label="Мобильное меню">
+  <a href="sites.html">Продающие сайты</a><a href="direct.html">Яндекс Директ</a><a href="seo.html">SEO-продвижение</a><a href="vk-ads.html">Таргет VK Ads</a><a href="analytics.html">Сквозная аналитика</a><a href="smm.html">SMM</a>
+  <a href="calculator.html">Калькулятор цены</a>
+  <a href="cases.html">Кейсы</a>
+  <a href="contacts.html">Контакты</a>
+  <a href="tel:+70000000000">+7 (000) 000-00-00</a>
+  <a class="rg-btn rg-btn--primary" href="#lead" data-open-lead>Получить расчёт</a>
+</nav>
+<main id="main">
+<section class="page-hero" style="padding-bottom:32px">
+  <div class="container">
+    <p class="crumbs"><a href="index.html">Главная</a> / Калькулятор</p>
+    <h1 class="rg-headline h1">Калькулятор <em>стоимости</em> маркетинга</h1>
+    <p class="lead">Яндекс Директ, VK Ads, SEO и SMM — цена ведения, разовые работы и прогноз заявок для вашей ниши за минуту. Цена из калькулятора фиксируется в договоре.</p>
+  </div>
+</section>
+<section class="section section--raised" id="calculator">
+  <div class="container">
+    
+    <div class="calc" id="calc">
+      <div class="calc__form">
+        <fieldset class="calc-step">
+          <legend><span>1</span> Ваш бизнес</legend>
+          <div class="row2">
+            <div class="field"><label for="c-niche">Ниша</label><select id="c-niche" name="niche"><option value="flowers" selected>Цветы и подарки</option><option value="food">Кафе, доставка еды</option><option value="beauty">Красота, медицина</option><option value="repair">Ремонт, стройка, услуги для дома</option><option value="auto">Авто: продажа и сервис</option><option value="edu">Обучение, курсы</option><option value="realty">Недвижимость</option><option value="b2b">B2B, производство, опт</option><option value="other">Другое</option></select></div>
+            <div class="field"><label for="c-check">Средний чек, ₽</label><input id="c-check" name="check" type="number" min="0" step="500" value="5000" inputmode="numeric"></div>
+          </div>
+          <div class="field"><span class="field__label">Где ваши клиенты</span><div class="opts"><label><input type="radio" name="region" value="local" checked><span>Мой город / область</span></label><label><input type="radio" name="region" value="msk"><span>Москва и МО</span></label><label><input type="radio" name="region" value="rf"><span>Вся Россия</span></label></div></div>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend><span>2</span> Каналы привлечения</legend>
+          <div class="calc-svc" data-svc="direct">
+      <label class="calc-svc__head">
+        <input type="checkbox" name="svc_direct" checked>
+        <span class="calc-svc__check" aria-hidden="true"></span>
+        <span><b>Яндекс Директ</b><small>Поиск, РСЯ — заявки с первой недели</small></span>
+      </label>
+      <div class="calc-svc__opts"><div class="calc-range">
+        <div class="calc-range__top"><label for="c-direct_budget">Рекламный бюджет в месяц</label><output data-out="direct_budget">60 000 ₽</output></div>
+        <input id="c-direct_budget" type="range" name="direct_budget" min="20000" max="500000" step="5000" value="60000">
+        <div class="calc-range__scale"><span>20 000 ₽</span><span>500 000 ₽</span></div>
+      </div><label class="tick"><input type="checkbox" name="direct_shop"><span>Товарные кампании / Мастер кампаний (для магазинов)</span></label></div>
+    </div>
+          <div class="calc-svc" data-svc="vk-ads">
+      <label class="calc-svc__head">
+        <input type="checkbox" name="svc_vk">
+        <span class="calc-svc__check" aria-hidden="true"></span>
+        <span><b>Таргет VK Ads</b><small>ВКонтакте, Одноклассники, лид-формы</small></span>
+      </label>
+      <div class="calc-svc__opts"><div class="calc-range">
+        <div class="calc-range__top"><label for="c-vk_budget">Рекламный бюджет в месяц</label><output data-out="vk_budget">30 000 ₽</output></div>
+        <input id="c-vk_budget" type="range" name="vk_budget" min="15000" max="300000" step="5000" value="30000">
+        <div class="calc-range__scale"><span>15 000 ₽</span><span>300 000 ₽</span></div>
+      </div></div>
+    </div>
+          <div class="calc-svc" data-svc="seo">
+      <label class="calc-svc__head">
+        <input type="checkbox" name="svc_seo">
+        <span class="calc-svc__check" aria-hidden="true"></span>
+        <span><b>SEO-продвижение</b><small>Топ Яндекса и Google — заявки без оплаты за клик</small></span>
+      </label>
+      <div class="calc-svc__opts"><div class="field"><span class="field__label">Сайт</span><div class="opts"><label><input type="radio" name="seo_size" value="landing"><span>Лендинг</span></label><label><input type="radio" name="seo_size" value="site" checked><span>Сайт до 50 стр.</span></label><label><input type="radio" name="seo_size" value="shop"><span>Интернет-магазин</span></label></div></div></div>
+    </div>
+          <div class="calc-svc" data-svc="smm">
+      <label class="calc-svc__head">
+        <input type="checkbox" name="svc_smm">
+        <span class="calc-svc__check" aria-hidden="true"></span>
+        <span><b>SMM</b><small>Ведение сообществ ВК и Telegram</small></span>
+      </label>
+      <div class="calc-svc__opts"><div class="field"><span class="field__label">Постов в неделю</span><div class="opts"><label><input type="radio" name="smm_posts" value="3" checked><span>3</span></label><label><input type="radio" name="smm_posts" value="5"><span>5</span></label><label><input type="radio" name="smm_posts" value="7"><span>7</span></label></div></div><label class="tick"><input type="checkbox" name="smm_tg"><span>+ Telegram-канал</span></label><label class="tick"><input type="checkbox" name="smm_video"><span>+ Клипы и истории</span></label></div>
+    </div>
+        </fieldset>
+
+        <fieldset class="calc-step">
+          <legend><span>3</span> Дополнительно</legend>
+          <div class="field"><span class="field__label">Сайт</span><div class="opts"><label><input type="radio" name="site" value="none" checked><span>Уже есть</span></label><label><input type="radio" name="site" value="express"><span>Экспресс-сайт · 10 000 ₽</span></label><label><input type="radio" name="site" value="landing"><span>Продающий лендинг · 40 000 ₽</span></label><label><input type="radio" name="site" value="shop"><span>Магазин / многостраничник · 80 000 ₽</span></label></div></div>
+          <label class="tick"><input type="checkbox" name="analytics"><span>Сквозная аналитика: коллтрекинг + CRM · 15 000 ₽ разово</span></label>
+        </fieldset>
+      </div>
+
+      <aside class="calc__sum" aria-live="polite">
+        <p class="calc__sum-label">Ведение в месяц</p>
+        <p class="calc__big" data-r="monthly">0 ₽</p>
+        <dl class="calc__rows">
+          <div data-r="disc-row" hidden><dt>Скидка за пакет</dt><dd data-r="disc"></dd></div>
+          <div><dt>Разово: настройка, сайт</dt><dd data-r="once">0 ₽</dd></div>
+          <div><dt>Рекламный бюджет<br><small>платите напрямую в Яндекс / VK</small></dt><dd data-r="ads">—</dd></div>
+        </dl>
+        <p class="calc__upsell" data-r="upsell"></p>
+        <p class="calc__empty" data-r="empty" hidden>Выберите хотя бы один канал.</p>
+
+        <div class="calc__fc" data-r="forecast">
+          <p class="calc__sum-label">Прогноз на месяц</p>
+          <div class="calc__fc-grid">
+            <div><b data-r="leads">—</b><span>заявок</span></div>
+            <div><b data-r="cpl">—</b><span>цена заявки</span></div>
+            <div><b data-r="sales">—</b><span>продаж</span></div>
+            <div><b data-r="romi">—</b><span>окупаемость</span></div>
+          </div>
+          <p class="calc__rev">Выручка: <b data-r="revenue">—</b></p>
+          <p class="calc__note" data-r="romi-note"></p>
+        </div>
+        <p class="calc__note" data-r="seo-note" hidden>SEO и SMM работают накопительно: первые заявки из поиска — через 2–4 месяца, дальше поток растёт без оплаты за клик.</p>
+
+        <form class="lead-form calc__form-lead" novalidate>
+          <input type="hidden" name="calc" value="">
+          <input type="hidden" name="service[]" value="Калькулятор">
+          <div class="field"><label for="calc-phone">Телефон — пришлём точный расчёт</label><input id="calc-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" required></div>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="consent"><input type="checkbox" name="consent" required><span>Согласен с <a href="privacy.html" target="_blank">политикой обработки данных</a></span></label>
+          <button class="rg-btn rg-btn--primary" type="submit">Зафиксировать цену</button>
+          <p class="form-note" role="status" aria-live="polite"></p>
+        </form>
+        <p class="calc__fine">Прогноз — по средней цене заявки в нише за 2025–2026 гг. Точные цифры по вашему региону и конкурентам — после бесплатного разбора.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+<section class="section section--accent" id="lead">
+  <div class="container cta__grid">
+    <div>
+      <p class="label">Бесплатный расчёт</p>
+      <h2 class="rg-headline h1" style="margin-top:16px">Посчитаем, сколько <em>заявок</em> даст ваш бюджет</h2>
+      <p class="lead">Оставьте телефон — за 1 рабочий день разберём нишу и конкурентов и пришлём расчёт: сколько стоит заявка и сколько их будет. Бесплатно и без обязательств.</p>
+      <ul class="checks" style="margin-top:32px">
+        <li>Прогноз заявок и цены лида по вашей нише</li>
+        <li>Разбор 3 конкурентов: где они берут клиентов</li>
+        <li>План запуска с цифрами — останется у вас</li>
+      </ul>
+      <div class="cta__contacts">
+        <span>Или напишите напрямую:</span>
+        <a href="tel:+70000000000">+7 (000) 000-00-00</a>
+        <a href="https://t.me/USERNAME" target="_blank" rel="noopener">Telegram →</a>
+      </div>
+    </div>
+    <form class="lead-form" novalidate>
+    <fieldset class="chips"><legend>Что нужно</legend><label><input type="checkbox" name="service[]" value="Сайт"><span>Сайт</span></label><label><input type="checkbox" name="service[]" value="Яндекс Директ"><span>Яндекс Директ</span></label><label><input type="checkbox" name="service[]" value="SEO"><span>SEO</span></label><label><input type="checkbox" name="service[]" value="VK Ads"><span>VK Ads</span></label><label><input type="checkbox" name="service[]" value="Аналитика"><span>Аналитика</span></label><label><input type="checkbox" name="service[]" value="SMM"><span>SMM</span></label></fieldset>
+    <div class="row2">
+      <div class="field"><label for="cta-name">Имя</label><input id="cta-name" name="name" autocomplete="name" placeholder="Как к вам обращаться"></div>
+      <div class="field"><label for="cta-phone">Телефон *</label><input id="cta-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" required></div>
+    </div>
+    <div class="field"><label for="cta-site">Сайт или ниша</label><input id="cta-site" name="site" placeholder="Например: доставка цветов, Щёлково"></div>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="consent"><input type="checkbox" name="consent" required><span>Согласен на обработку персональных данных по <a href="privacy.html" target="_blank">политике</a></span></label>
+    <button class="rg-btn rg-btn--on-accent" type="submit">Получить расчёт</button>
+    <p class="form-note" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+</main>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="stack">
+        <img class="footer__logo" src="assets/img/logo-dark.svg" alt="Регион Маркетинг" width="170" height="55" loading="lazy">
+        <p class="muted" style="color:var(--ink-inverse-muted);max-width:300px">Делаем продающие сайты и обеспечиваем поток клиентов. С 2009 года.</p>
+      </div>
+      <div><h4>Услуги</h4><ul><li><a href="sites.html">Продающие сайты</a></li><li><a href="direct.html">Яндекс Директ</a></li><li><a href="seo.html">SEO-продвижение</a></li><li><a href="vk-ads.html">Таргет VK Ads</a></li><li><a href="analytics.html">Сквозная аналитика</a></li><li><a href="smm.html">SMM</a></li></ul></div>
+      <div><h4>Агентство</h4><ul><li><a href="calculator.html">Калькулятор цены</a></li><li><a href="cases.html">Кейсы</a></li><li><a href="index.html#process">Как работаем</a></li><li><a href="index.html#faq">Вопросы</a></li><li><a href="contacts.html">Контакты</a></li></ul></div>
+      <div><h4>Связаться</h4><ul>
+        <li><a href="tel:+70000000000">+7 (000) 000-00-00</a></li>
+        <li><a href="mailto:hello@region-studio.ru">hello@region-studio.ru</a></li>
+        <li><a href="https://t.me/USERNAME" target="_blank" rel="noopener">Telegram</a> · <a href="https://wa.me/70000000000" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li style="color:var(--ink-inverse-muted)">Москва и Подмосковье, работаем по всей России</li>
+      </ul></div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2009–2026 Регион Маркетинг · ИП [ФИО], ИНН [000000000000]</span>
+      <a href="privacy.html">Политика обработки персональных данных</a>
+    </div>
+  </div>
+</footer>
+<a class="rg-btn rg-btn--primary float-cta" href="#lead" data-open-lead>Получить расчёт</a>
+<dialog class="modal" id="lead-modal" aria-labelledby="modal-title">
+  <div class="modal__in">
+    <button class="modal__close" type="button" aria-label="Закрыть"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <h2 class="h3" id="modal-title">Бесплатный разбор вашего маркетинга</h2>
+    <p class="muted">Перезвоним в течение рабочего часа. За 1 день пришлём прогноз заявок, цену лида и план запуска — даже если не будем работать вместе.</p>
+    <form class="lead-form" novalidate>
+    <fieldset class="chips"><legend>Что нужно</legend><label><input type="checkbox" name="service[]" value="Сайт"><span>Сайт</span></label><label><input type="checkbox" name="service[]" value="Яндекс Директ"><span>Яндекс Директ</span></label><label><input type="checkbox" name="service[]" value="SEO"><span>SEO</span></label><label><input type="checkbox" name="service[]" value="VK Ads"><span>VK Ads</span></label><label><input type="checkbox" name="service[]" value="Аналитика"><span>Аналитика</span></label><label><input type="checkbox" name="service[]" value="SMM"><span>SMM</span></label></fieldset>
+    <div class="row2">
+      <div class="field"><label for="m-name">Имя</label><input id="m-name" name="name" autocomplete="name" placeholder="Как к вам обращаться"></div>
+      <div class="field"><label for="m-phone">Телефон *</label><input id="m-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__" required></div>
+    </div>
+    <div class="field"><label for="m-site">Сайт или ниша</label><input id="m-site" name="site" placeholder="Например: доставка цветов, Щёлково"></div>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="consent"><input type="checkbox" name="consent" required><span>Согласен на обработку персональных данных по <a href="privacy.html" target="_blank">политике</a></span></label>
+    <button class="rg-btn rg-btn--on-accent" type="submit">Получить расчёт</button>
+    <p class="form-note" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</dialog>
+<script>window.RG_CONFIG={metrikaId:null,formEndpoint:"send.php",thanksPage:"thanks.html",phone:"+7 (000) 000-00-00",phoneRaw:"+70000000000",telegram:"https://t.me/USERNAME"};</script>
+<script src="assets/js/main.js" defer></script>
+<script>window.RG_PRICES={"direct": {"setup": 15000, "shopExtra": 7000, "fee": [[50000, 15000], [150000, 25000], [300000, 35000], [1000000000, 45000]]}, "vk": {"setup": 12000, "cplRatio": 1.1, "fee": [[50000, 15000], [150000, 22000], [1000000000, 30000]]}, "seo": {"region": {"local": 25000, "msk": 40000, "rf": 55000}, "size": {"landing": 0.8, "site": 1, "shop": 1.4}}, "smm": {"posts": {"3": 20000, "5": 28000, "7": 36000}, "telegram": 8000, "video": 10000, "setup": 8000}, "site": {"none": 0, "express": 10000, "landing": 40000, "shop": 80000}, "analytics": 15000, "bundle": {"0": 0, "1": 0, "2": 0.05, "3": 0.1, "4": 0.15}, "closeRate": 0.25, "niches": {"flowers": {"name": "Цветы и подарки", "cpl": 450}, "food": {"name": "Кафе, доставка еды", "cpl": 350}, "beauty": {"name": "Красота, медицина", "cpl": 700}, "repair": {"name": "Ремонт, стройка, услуги для дома", "cpl": 900}, "auto": {"name": "Авто: продажа и сервис", "cpl": 1200}, "edu": {"name": "Обучение, курсы", "cpl": 800}, "realty": {"name": "Недвижимость", "cpl": 2500}, "b2b": {"name": "B2B, производство, опт", "cpl": 2000}, "other": {"name": "Другое", "cpl": 1000}}, "regions": {"local": {"name": "Мой город / область", "cpl": 1}, "msk": {"name": "Москва и МО", "cpl": 1.35}, "rf": {"name": "Вся Россия", "cpl": 1.15}}};</script><script src="assets/js/calc.js" defer></script>
+</body>
+</html>
