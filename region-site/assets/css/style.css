@@ -423,3 +423,16 @@ input[type=range]:focus-visible{outline:2px solid var(--focus-ring);outline-offs
 .calc__form-lead .form-note{color:var(--accent-on-ink)}
 .calc__fine{font-size:12px;line-height:1.4;color:var(--ink-inverse-muted)}
 [hidden]{display:none!important}
+
+/* фото основателя */
+.founder__media{position:relative;padding:0 var(--space-6) var(--space-6) 0}
+.founder__media::before{content:"";position:absolute;left:var(--space-6);top:var(--space-6);right:0;bottom:0;background:var(--brand-violet)}
+.founder__img{position:relative;aspect-ratio:4/5;border-radius:0}
+.founder__img img{object-position:50% 20%}
+.founder__badge{position:absolute;left:-16px;bottom:48px;background:var(--brand-ink);color:var(--brand-light);padding:var(--space-4) var(--space-6);border-radius:var(--radius-md)}
+.founder__badge b{display:block;font-size:30px;font-weight:800;line-height:1}
+.founder__badge span{font-size:14px;color:var(--ink-inverse-muted)}
+@media (max-width:860px){.founder__media{max-width:380px}.founder__img{max-width:none;aspect-ratio:4/5}.founder__badge{left:0}}
+.hero__slots img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.hero__slots::before{display:none}
+.hero__slots img{border:2px solid var(--brand-violet);animation:pulse 1.8s infinite}

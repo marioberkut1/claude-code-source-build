@@ -491,7 +491,7 @@ def build_index():
         <a class="rg-btn rg-btn--primary rg-btn--lg" href="#calculator">Рассчитать стоимость</a>
         <a class="rg-btn rg-btn--secondary rg-btn--lg" href="#lead" data-open-lead>Бесплатный разбор</a>
       </div>
-      <p class="hero__slots">{CONFIG["slots"]}</p>
+      <p class="hero__slots"><img src="assets/img/founder-avatar.webp" alt="" width="40" height="40">{CONFIG["slots"]}</p>
     </div>
     {HERO_ART}
   </div>
@@ -569,9 +569,9 @@ def build_index():
 
 <section class="section">
   <div class="container founder">
-    <div class="founder__img" aria-hidden="true">
-      <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid slice"><rect width="400" height="480" fill="#6147ff"/><rect x="0" y="300" width="160" height="180" fill="#1d1d1e"/><polyline class="growth" stroke="#f3f3f3" points="-10,420 70,360 110,420 170,380 220,430 300,200 340,270 380,150 420,90"/></svg>
-      <!-- [заменить на фото: <img src="assets/img/founder.jpg" alt="Александр Нестеров"> ] -->
+    <div class="founder__media">
+      <div class="founder__img"><img src="assets/img/founder.webp" alt="Александр Нестеров, основатель агентства «Регион Маркетинг»" width="800" height="1202" loading="lazy"></div>
+      <div class="founder__badge"><b>25 лет</b><span>в маркетинге</span></div>
     </div>
     <div>
       <p class="label">Кто отвечает за результат</p>
