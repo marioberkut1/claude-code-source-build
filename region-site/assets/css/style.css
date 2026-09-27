@@ -436,3 +436,7 @@ input[type=range]:focus-visible{outline:2px solid var(--focus-ring);outline-offs
 .hero__slots img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
 .hero__slots::before{display:none}
 .hero__slots img{border:2px solid var(--brand-violet);animation:pulse 1.8s infinite}
+
+/* модалка: второстепенный текст на фиолетовом — on-accent */
+.modal .muted{color:var(--on-accent);opacity:.92}
+.modal .field label,.modal .chips legend{color:var(--on-accent)}
